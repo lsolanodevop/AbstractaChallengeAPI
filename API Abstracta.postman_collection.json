@@ -1,0 +1,483 @@
+{
+	"info": {
+		"_postman_id": "9a0f2dec-679c-4e2d-944b-1b3b5d33cf1c",
+		"name": "API Abstracta",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "2594131"
+	},
+	"item": [
+		{
+			"name": "Step 1",
+			"item": [
+				{
+					"name": "Login - /user/login",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}v2/user/login?username={{username}}&password={{password}}",
+							"host": [
+								"{{apiURL}}v2"
+							],
+							"path": [
+								"user",
+								"login"
+							],
+							"query": [
+								{
+									"key": "username",
+									"value": "{{username}}"
+								},
+								{
+									"key": "password",
+									"value": "{{password}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "- Paso 1 - Login",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Validate JSON response\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.eql(200);",
+							"    pm.expect(jsonData.type).to.eql(\"unknown\");",
+							"    pm.expect(jsonData.message).to.include(\"logged in user session\");",
+							"});",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"pm.test(\"Message format is correct\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.match(/^logged in user session:\\d+$/);",
+							"});",
+							"pm.test(\"No additional fields in response\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(Object.keys(jsonData)).to.have.members(['code', 'type', 'message']);",
+							"});",
+							"pm.test(\"Content-Type is application/json\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\", \"application/json\");",
+							"});",
+							"pm.test(\"Response time is less than 1500ms\", function () {",
+							"    pm.expect(pm.response.responseTime).to.be.below(1500);",
+							"});",
+							"pm.test(\"Type is not an empty string\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.type).to.not.be.empty;",
+							"});",
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Step 2",
+			"item": [
+				{
+					"name": "Find pet by ID - /pet/{petId}",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}v2/pet/{{petID}}",
+							"host": [
+								"{{apiURL}}v2"
+							],
+							"path": [
+								"pet",
+								"{{petID}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "- Paso 2 - Listar mascotas disponibles",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Validate JSON response\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.id).to.be.a('number');",
+							"    pm.expect(jsonData.category).to.be.an('object');",
+							"    pm.expect(jsonData.category.id).to.be.a('number');",
+							"    pm.expect(jsonData.category.name).to.be.a('string');",
+							"    pm.expect(jsonData.name).to.be.a('string');",
+							"    pm.expect(jsonData.photoUrls).to.be.an('array');",
+							"    jsonData.photoUrls.forEach(url => {",
+							"        pm.expect(url).to.be.a('string');",
+							"    });",
+							"    pm.expect(jsonData.tags).to.be.an('array');",
+							"    jsonData.tags.forEach(tag => {",
+							"        pm.expect(tag).to.be.an('object');",
+							"        pm.expect(tag.id).to.be.a('number');",
+							"        pm.expect(tag.name).to.be.a('string');",
+							"    });",
+							"    pm.expect(jsonData.status).to.be.oneOf(['available', 'pending', 'sold']);",
+							"});",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"pm.test(\"At least one photo URL is present\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.photoUrls.length).to.be.at.least(1);",
+							"});",
+							"pm.test(\"Category name is not an empty string\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.category.name).to.not.be.empty;",
+							"});",
+							"pm.test(\"Every tag has a non-empty name\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    jsonData.tags.forEach(tag => {",
+							"        pm.expect(tag.name).to.not.be.empty;",
+							"    });",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Step 3",
+			"item": [
+				{
+					"name": "Find pets by status - /pet/findByStatus",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}v2/pet/findByStatus?status={{status}}",
+							"host": [
+								"{{apiURL}}v2"
+							],
+							"path": [
+								"pet",
+								"findByStatus"
+							],
+							"query": [
+								{
+									"key": "status",
+									"value": "{{status}}"
+								}
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "- Paso 3 - Consultar datos de una mascota disponible",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"pm.test(\"Response is an array\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData).to.be.an('array');",
+							"});",
+							"pm.test(\"Array has at least one element\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.length).to.be.at.least(1);",
+							"});",
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Step 4",
+			"item": [
+				{
+					"name": "Place an order for a pet - /store/order",
+					"request": {
+						"method": "POST",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{{order}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}v2/store/order",
+							"host": [
+								"{{apiURL}}v2"
+							],
+							"path": [
+								"store",
+								"order"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "- Paso 4 - Crear una orden para una mascota",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"pm.test(\"ID is a number\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.id).to.be.a('number');",
+							"});",
+							"pm.test(\"Pet ID is a number\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.petId).to.be.a('number');",
+							"});",
+							"pm.test(\"Quantity is a positive number\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.quantity).to.be.a('number');",
+							"    pm.expect(jsonData.quantity).to.be.at.least(1);",
+							"});",
+							"pm.test(\"Ship Date follows the correct format\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    let datePattern = /^\\d{4}-\\d{2}-\\d{2}T\\d{2}:\\d{2}:\\d{2}\\.\\d{3}\\+\\d{4}$/;",
+							"    pm.expect(jsonData.shipDate).to.match(datePattern);",
+							"});",
+							"pm.test(\"Status is valid\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.status).to.be.oneOf(['placed', 'approved', 'delivered', 'sold']);  // Estoy asumiendo posibles valores, ajústalos según tu API.",
+							"});",
+							"pm.test(\"Complete is a boolean\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.complete).to.be.a('boolean');",
+							"});"
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Step 5",
+			"item": [
+				{
+					"name": "Update user - /user/{username}",
+					"request": {
+						"method": "PUT",
+						"header": [],
+						"body": {
+							"mode": "raw",
+							"raw": "{{moduser}}",
+							"options": {
+								"raw": {
+									"language": "json"
+								}
+							}
+						},
+						"url": {
+							"raw": "{{apiURL}}v2/user/{{_user}}",
+							"host": [
+								"{{apiURL}}v2"
+							],
+							"path": [
+								"user",
+								"{{_user}}"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "- Paso 5 - Actualizar Usuario",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"pm.test(\"Code is a number with value 200\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.be.a('number');",
+							"    pm.expect(jsonData.code).to.eql(200);",
+							"});",
+							"pm.test(\"Type is a string with value 'unknown'\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.type).to.be.a('string');",
+							"    pm.expect(jsonData.type).to.eql('unknown');",
+							"});",
+							"pm.test(\"Message is a string representing a number\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.be.a('string');",
+							"    pm.expect(Number(jsonData.message)).to.not.be.NaN;  // Esto verifica que la cadena puede convertirse en un número.",
+							"});",
+							""
+						]
+					}
+				}
+			]
+		},
+		{
+			"name": "Step 6",
+			"item": [
+				{
+					"name": "Logout - /user/logout",
+					"request": {
+						"method": "GET",
+						"header": [],
+						"url": {
+							"raw": "{{apiURL}}v2/user/logout",
+							"host": [
+								"{{apiURL}}v2"
+							],
+							"path": [
+								"user",
+								"logout"
+							]
+						}
+					},
+					"response": []
+				}
+			],
+			"description": "- Paso 6 - Logout",
+			"event": [
+				{
+					"listen": "prerequest",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							""
+						]
+					}
+				},
+				{
+					"listen": "test",
+					"script": {
+						"type": "text/javascript",
+						"exec": [
+							"pm.test(\"Status code is 200\", function () {",
+							"    pm.response.to.have.status(200);",
+							"});",
+							"pm.test(\"Content-Type is present\", function () {",
+							"    pm.response.to.have.header(\"Content-Type\");",
+							"});",
+							"pm.test(\"Code is a number with value 200\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.code).to.be.a('number');",
+							"    pm.expect(jsonData.code).to.eql(200);",
+							"});",
+							"pm.test(\"Type is a string with value 'unknown'\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.type).to.be.a('string');",
+							"    pm.expect(jsonData.type).to.eql('unknown');",
+							"});",
+							"pm.test(\"Message is a string with value 'ok'\", function () {",
+							"    let jsonData = pm.response.json();",
+							"    pm.expect(jsonData.message).to.be.a('string');",
+							"    pm.expect(jsonData.message).to.eql('ok');",
+							"});",
+							""
+						]
+					}
+				}
+			]
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	]
+}
